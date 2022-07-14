@@ -1,9 +1,11 @@
 #include "hex.h"
 
 
+// Renders the current `state` of the buffer.
+// Calls other rendering functions if needed.
 void h_render(struct h_state_t *state) {
-  h_cls();
-  h_goto(0, 0);
+  h_tty_cls();
+  h_tty_goto(0, 0);
 
   if (state->bufsz == 0) {
     printf("Empty buffer, type `:e FNAME` to edit file FNAME.");
@@ -46,12 +48,14 @@ void h_render(struct h_state_t *state) {
   h_render_statusline(state);
 }
 
+// Loads the `buf` of size `bufsz` bytes into the `state`'s buffer.
 void h_load_buffer(struct h_state_t *state, uint8_t *buf, size_t bufsz) {
   state->buffer = calloc(bufsz, sizeof(uint8_t));
   state->bufsz = bufsz;
   memcpy(state->buffer, buf, bufsz);
 }
 
+// Initializes the `state` with sensible defaults.
 void h_state_init(struct h_state_t *state) {
   state->buffer = NULL;
   state->bufsz = 0;
@@ -77,11 +81,12 @@ void h_state_init(struct h_state_t *state) {
   memset(state->msgbuf, 0, H_MSGBUFSZ);
   state->ascii = false;
   state->header = false;
-  state->autosize = true;
+  state->autosize = false;
 
   memset(state->fname, 0, H_BUFSZ);
 }
 
+// Updates the `state` according to the current size of the TTY.
 void h_tty_update(struct h_state_t *state) {
   uint32_t ttysz = h_ttysz();
   state->tcw = ttysz >> 16;
@@ -99,12 +104,15 @@ void h_tty_update(struct h_state_t *state) {
   }
 }
 
+// Returns a number of the next byte to the last byte that should be
+// displayed.
 int h_getlim(struct h_state_t *state) {
   int lim = state->offset + state->cols * state->lines;
   lim = lim < state->bufsz ? lim : state->bufsz;
   return lim;
 }
 
+// Sets the current `state`'s message to the formatted string `fmt`.
 void h_msg(struct h_state_t *state, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
@@ -112,10 +120,14 @@ void h_msg(struct h_state_t *state, const char *fmt, ...) {
   va_end(args);
 }
 
+// Clears the current `state`'s message.
 void h_msg_clear(struct h_state_t *state) {
   memset(state->msgbuf, 0, H_MSGBUFSZ);
 }
 
+// Returns an ANSI escape sequence if the byte in the `pos` position
+// should be formatted somehow. If it shouldn't, the function will
+// return NULL.
 const char *h_getansi(struct h_state_t *state, int pos) {
   if (pos == state->cursor_pos) {
     return "\x1b[7m";
@@ -124,6 +136,8 @@ const char *h_getansi(struct h_state_t *state, int pos) {
   return NULL;
 }
 
+// Renders the ASCII representation of the current line
+// (the one containing the byte in the `pos` position).
 void h_render_ascii(struct h_state_t *state, int pos) {
   int start = pos - (pos % state->cols);
   int end = start + state->cols;
@@ -148,6 +162,7 @@ void h_render_ascii(struct h_state_t *state, int pos) {
   printf("\n");
 }
 
+// Renders the status line.
 void h_render_statusline(struct h_state_t *state) {
   printf("CUR %d    ", state->cursor_pos);
   printf("KEY %u %c    ",
@@ -173,10 +188,10 @@ void h_render_statusline(struct h_state_t *state) {
   }
 }
 
-
+// Validates the current cursor position. If the position is wrong,
+// the function tries to set the cursor in a proper position.
 void h_cursor_validate(struct h_state_t *state) {
   int pos = state->cursor_pos;
-
 
   if (pos < 0) {
     state->cursor_pos = 0;
@@ -207,11 +222,13 @@ void h_cursor_validate(struct h_state_t *state) {
   }
 }
 
+// Moves the cursor to an arbitrary position `new_pos`.
 void h_cursor_goto(struct h_state_t *state, int new_pos) {
   state->cursor_pos = new_pos;
   h_cursor_validate(state);
 }
 
+// Moves the cursor relative to the current position by `diff` bytes.
 void h_cursor_move(struct h_state_t *state, int diff) {
   int new_pos = state->cursor_pos + diff;
 
@@ -224,13 +241,14 @@ void h_cursor_move(struct h_state_t *state, int diff) {
   h_cursor_validate(state);
 }
 
-
+// Resets the command line buffer and exits the command line mode.
 void h_cmd_clear(struct h_state_t *state) {
   memset(state->cmdbuf, 0, H_CMDBUFSZ);
   state->cmdpos = 0;
   state->cmdline = false;
 }
 
+// Reads a file `fname` and calls the buffer loading function.
 void h_edit_file(struct h_state_t *state, const char *fname) {
   FILE *f = fopen(fname, "rb");
 
@@ -248,6 +266,7 @@ void h_edit_file(struct h_state_t *state, const char *fname) {
   h_load_buffer(state, buf, nbytes);
 }
 
+// Writes the current state of the buffer into a file named `fname`.
 void h_save_file(struct h_state_t *state, const char *fname) {
   FILE *f = fopen(fname, "wb");
 
@@ -262,6 +281,7 @@ void h_save_file(struct h_state_t *state, const char *fname) {
   h_msg(state, "Written %zu bytes to '%s'", nbytes, fname);
 }
 
+// Handles the command passed by the user in the command line mode.
 void h_cmd_handle(struct h_state_t *state) {
   char *cmd = state->cmdbuf;
 
@@ -357,6 +377,7 @@ void h_cmd_handle(struct h_state_t *state) {
   h_cmd_clear(state);
 }
 
+// Handles the key pressed by the user in the command line mode.
 void h_key_handle_cmd(int key, struct h_state_t *state) {
   switch (key) {
     case '\x1b': {
@@ -388,6 +409,7 @@ void h_key_handle_cmd(int key, struct h_state_t *state) {
   h_render(state);
 }
 
+// Handles the key pressed by the user in the normal mode.
 void h_key_handle(int key, struct h_state_t *state) {
   state->last_key = key;
 

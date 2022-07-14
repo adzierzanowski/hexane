@@ -8,11 +8,11 @@ struct pollfd fds = {
   .events = POLLIN
 };
 
-void h_cls() {
+void h_tty_cls() {
   printf("\x1b[2J");
 }
 
-void h_goto(uint16_t x, uint16_t y) {
+void h_tty_goto(uint16_t x, uint16_t y) {
   printf("\x1b[%d;%dH", y, x);
 }
 
@@ -36,7 +36,6 @@ void h_tty_setup(void) {
 
 void h_tty_restore(void) {
   tcsetattr(STDIN_FILENO, TCSANOW, &encountered_term);
-  puts("Restored tty");
 }
 
 int h_esc_lbracket_1() {

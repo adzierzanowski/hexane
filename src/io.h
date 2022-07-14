@@ -23,15 +23,41 @@
 #define H_K_F7 0x10b
 #define H_K_F8 0x10c
 
-void h_cls(void);
-void h_goto(uint16_t x, uint16_t y);
+// TERMINAL ROUTINES
+
+// Clears the terminal
+void h_tty_cls(void);
+
+// Moves the tty cursor to a position (x, y)
+void h_tty_goto(uint16_t x, uint16_t y);
+
+// Gets the current size of the terminal
+// Returns the width in the higher word and the height in the lower word
 uint32_t h_ttysz(void);
+
+// Sets the mode of the TTY (non-canonical input, no echo, etc.)
 void h_tty_setup(void);
+
+// Restores the TTY state encountered on start of the program
 void h_tty_restore(void);
+
+
+// FETCHING INPUT ROUTINES
+
+// Handles the ESC[1 escape sequences (function keys)
 int h_esc_lbracket_1(void);
+
+// Handles the ESC[ escape sequences
 int h_esc_lbracket(void);
+
+// Handles the ESCO escape sequences
 int h_esc_o(void);
+
+// Handles the escape sequences
 int h_esc(void);
+
+// Handles the user input on stdin
 int h_getkey(void);
+
 
 #endif

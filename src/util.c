@@ -2,7 +2,6 @@
 
 
 bool h_strmatch(const char *str, ...) {
-
   va_list args;
   va_start(args, str);
 

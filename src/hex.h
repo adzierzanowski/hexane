@@ -18,10 +18,29 @@
 #define H_STATUSLINESZ 7
 
 
+enum h_seltype_t {
+  H_SELTYPE_NONE,
+  H_SELTYPE_NORMAL,
+  H_SELTYPE_SINGLE,
+  H_SELTYPE_RECT
+};
+
+struct h_select_t {
+  struct h_select_t *next;
+  int start;
+  int end;
+};
+
 struct h_state_t {
   uint8_t *buffer;
   size_t bufsz;
   int cursor_pos;
+
+  struct h_select_t *selections;
+  struct h_select_t *cursel;
+  enum h_seltype_t cursel_type;
+  size_t selsize;
+  size_t cursel_size;
 
   int cols;
   int lines;
@@ -122,5 +141,12 @@ void h_key_handle_cmd(int key, struct h_state_t *state);
 // Handles the keys in general
 void h_key_handle(int key, struct h_state_t *state);
 
+
+// SELECTION
+
+void h_select(struct h_state_t *state);
+void h_selection_update(struct h_state_t *state);
+void h_selection_clear(struct h_state_t *state);
+bool h_selection_includes(struct h_state_t *state, int pos);
 
 #endif

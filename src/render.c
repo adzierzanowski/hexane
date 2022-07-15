@@ -123,11 +123,23 @@ void h_tty_update(struct h_state_t *state) {
 
   if (state->lines > (state->tch - H_STATUSLINESZ)) {
     state->lines = state->tch - H_STATUSLINESZ;
+
+    if (state->header) {
+      state->lines--;
+    }
   }
 
   if (state->autosize) {
-    state->cols = state->tcw / 3;
+    if (state->ascii) {
+      state->cols = state->tcw / 4 - 1;
+    } else {
+      state->cols = state->tcw / 3;
+    }
+
     state->lines = state->tch - H_STATUSLINESZ;
+    if (state->header) {
+      state->lines--;
+    }
 
     h_render(state);
   }

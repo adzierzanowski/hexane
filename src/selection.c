@@ -53,16 +53,18 @@ void h_selection_clear(struct h_state_t *state) {
   struct h_select_t *ptr = state->cursel;
 
   while (ptr != NULL) {
+    struct h_select_t *next = ptr->next;
     free(ptr);
-    ptr = ptr->next;
+    ptr = next;
   }
   state->cursel = NULL;
   state->cursel_size = 0;
 
   ptr = state->selections;
   while (ptr != NULL) {
+    struct h_select_t *next = ptr->next;
     free(ptr);
-    ptr = ptr->next;
+    ptr = next;
   }
 
   state->selections = NULL;

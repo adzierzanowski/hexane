@@ -1,12 +1,12 @@
 #ifndef IO_H
 #define IO_H
 
+#include <poll.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
-#include <poll.h>
-#include <stdio.h>
-#include <stdint.h>
 
 #include <sys/ioctl.h>
 
@@ -22,6 +22,7 @@
 #define H_K_F6 0x10a
 #define H_K_F7 0x10b
 #define H_K_F8 0x10c
+
 
 // TERMINAL ROUTINES
 

@@ -1,11 +1,13 @@
-#include <stdio.h>
-#include <unistd.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
+#include "buffer.h"
 #include "io.h"
-#include "hex.h"
-
+#include "keys.h"
+#include "render.h"
+#include "state.h"
 
 static struct h_state_t state = {0};
 

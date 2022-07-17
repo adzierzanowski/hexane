@@ -86,20 +86,22 @@ void h_render_statusline(struct h_state_t *state) {
 
   printf("\n");
 
-  void *ptr = (void *) &state->buffer[state->cursor_pos];
-  uint8_t u8 = state->buffer[state->cursor_pos];
-  uint16_t *u16 = (uint16_t *) ptr;
-  uint32_t *u32 = (uint32_t *) ptr;
-  uint64_t *u64 = (uint64_t *) ptr;
+  if (state->bufsz > 0) {
+    void *ptr = (void *) &state->buffer[state->cursor_pos];
+    uint8_t u8 = state->buffer[state->cursor_pos];
+    uint16_t *u16 = (uint16_t *) ptr;
+    uint32_t *u32 = (uint32_t *) ptr;
+    uint64_t *u64 = (uint64_t *) ptr;
 
-  if (state->hex) {
-    printf(
-      "u8 %02x    u16 %04x    u32 %08x    u64 %016llx\n", u8, *u16, *u32, *u64);
-  } else {
-    printf(
-      "u8 %3u    u16 %5u    u32 %10u    u64 %20llu\n", u8, *u16, *u32, *u64);
-    printf(
-      "i8 %3d    i16 %5d    i32 %10d    i64 %20lld\n", u8, *u16, *u32, *u64);
+    if (state->hex) {
+      printf(
+        "u8 %02x    u16 %04x    u32 %08x    u64 %016llx\n", u8, *u16, *u32, *u64);
+    } else {
+      printf(
+        "u8 %3u    u16 %5u    u32 %10u    u64 %20llu\n", u8, *u16, *u32, *u64);
+      printf(
+        "i8 %3d    i16 %5d    i32 %10d    i64 %20lld\n", u8, *u16, *u32, *u64);
+    }
   }
 
   if (state->cmdline) {

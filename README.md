@@ -36,7 +36,6 @@ and this version will look very similar.
   * Multiple search queries
   * Navigate through search results
 * History
-* Comments
 * Serialization of metadata
 
 ## Dependencies

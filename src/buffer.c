@@ -5,6 +5,7 @@
 void h_load_buffer(struct h_state_t *state, uint8_t *buf, size_t bufsz) {
   state->buffer = calloc(bufsz, sizeof (uint8_t));
   state->markbuf = calloc(bufsz, sizeof (uint8_t));
+  state->combuf = calloc(bufsz, sizeof (char *));
   state->bufsz = bufsz;
   memcpy(state->buffer, buf, bufsz);
 }

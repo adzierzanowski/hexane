@@ -1,10 +1,24 @@
-CFLAGS = -O3 -Wall -Wpedantic
+CFLAGS = -O3 -Wall -Wpedantic -std=c11
 
 SRC = src
 BUILD = build
 TARGET = hexane
 
-NAMES = buffer cmdline cursor io keys main msg render selection state util mark main
+NAMES = comments \
+buffer \
+cmdline \
+cursor \
+io \
+keys \
+main \
+msg \
+render \
+selection \
+state \
+util \
+mark \
+main
+
 OBJ = $(addprefix $(BUILD)/, $(addsuffix .o, $(NAMES)))
 HEADERS = $(addprefix $(SRC)/, $(addsuffix .h, $(filter-out main, $(NAMES))))
 

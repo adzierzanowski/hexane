@@ -18,8 +18,15 @@ void h_cmd_handle(struct h_state_t *state) {
     return;
   }
 
+  // No-argument commands
   if (strcmp(cmd, "q") == 0) {
     exit(0);
+
+  } else if (h_strmatch(cmd, "v", "version", NULL)) {
+    h_msg(
+      state,
+      "%s v%s  %s %s  %s",
+      H_PROGNAME, H_VERSION, __DATE__, __TIME__, __VERSION__);
 
   } else if (h_strmatch(cmd, "a", "ascii", NULL)) {
     state->ascii = !state->ascii;
@@ -33,6 +40,7 @@ void h_cmd_handle(struct h_state_t *state) {
     state->autosize = !state->autosize;
     h_msg(state, "Autosize set to %s.", state->autosize ? "true" : "false");
 
+  // Commands taking arguments
   } else {
     char *tok = strtok(state->cmdbuf, " ");
 
@@ -52,6 +60,20 @@ void h_cmd_handle(struct h_state_t *state) {
       } else {
         h_msg(state, "Bad argument for cols.");
       }
+
+    } else if (h_strmatch(cmd, "com", "comment", NULL)) {
+      char *tok = strtok(NULL, "\n");
+
+      if (!tok) {
+        h_msg(state, "Comment requires a string argument.");
+        h_cmd_clear(state);
+        return;
+      }
+
+      h_comment_add(state, tok, state->cursor_pos);
+
+    } else if (h_strmatch(cmd, "comdel", NULL)) {
+      h_comment_remove(state, state->cursor_pos);
 
     } else if (h_strmatch(tok, "e", "edit", NULL)) {
       tok = strtok(NULL, " ");

@@ -6,6 +6,8 @@ void h_state_init(struct h_state_t *state) {
   state->buffer = NULL;
   state->bufsz = 0;
   state->cursor_pos = 0;
+  state->markbuf = NULL;
+  state->combuf = NULL;
 
   state->offset = 0;
 

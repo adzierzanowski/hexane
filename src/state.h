@@ -35,6 +35,9 @@ struct h_state_t {
   // Color-marking information
   uint8_t *markbuf;
 
+  // Comments
+  char **combuf;
+
   // Length of the main buffer
   size_t bufsz;
 

@@ -1,11 +1,13 @@
 #ifndef H_CMDLINE
 #define H_CMDLINE
 
+#include "comments.h"
 #include "buffer.h"
 #include "msg.h"
 #include "render.h"
 #include "state.h"
 #include "util.h"
+#include "version.h"
 
 
 // Handles the command

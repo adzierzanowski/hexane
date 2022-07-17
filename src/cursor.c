@@ -39,6 +39,7 @@ void h_cursor_validate(struct h_state_t *state) {
 void h_cursor_goto(struct h_state_t *state, int new_pos) {
   state->cursor_pos = new_pos;
   h_cursor_validate(state);
+  state->searchpos = state->cursor_pos;
 }
 
 // Moves the cursor relative to the current position by `diff` bytes.
@@ -52,4 +53,5 @@ void h_cursor_move(struct h_state_t *state, int diff) {
   state->cursor_pos = new_pos;
 
   h_cursor_validate(state);
+  state->searchpos = state->cursor_pos;
 }

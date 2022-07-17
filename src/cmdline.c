@@ -84,6 +84,15 @@ void h_cmd_handle(struct h_state_t *state) {
       }
 
       h_edit_file(state, tok);
+    } else if (h_strmatch(tok, "/", NULL)) {
+      tok = strtok(NULL, "\n");
+      if (!tok) {
+        h_msg(state, "Search command needs at least one query.");
+        h_cmd_clear(state);
+        return;
+      }
+
+      h_search_apply(state, tok);
 
     } else if (h_strmatch(tok, "w", "write", NULL)) {
       tok = strtok(NULL, " ");

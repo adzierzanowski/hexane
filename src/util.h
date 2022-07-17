@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 // Matches the string against other strings
@@ -12,5 +13,8 @@
 // Otherwise, false
 // The argument list is terminated with NULL
 bool h_strmatch(const char *str, ...);
+
+char **h_strsplit(char *str, const char *delim, size_t *splitsz);
+void h_strsplit_free(char **split, size_t splitsz);
 
 #endif

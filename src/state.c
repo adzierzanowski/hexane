@@ -37,6 +37,12 @@ void h_state_init(struct h_state_t *state) {
 
   memset(state->fname, 0, H_BUFSZ);
 
+  state->queries = NULL;
+  state->searchbuf = NULL;
+  state->searchposbuf = NULL;
+  state->search_result_count = 0;
+  state->searchpos = 0;
+
   state->selections = NULL;
   state->cursel = NULL;
   state->cursel_type = H_SELTYPE_NONE;

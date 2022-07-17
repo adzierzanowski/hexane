@@ -11,7 +11,7 @@
 #define H_MSGBUFSZ 0x100
 #define H_BUFSZ 0x100
 #define H_FBUFSZ 0x10000
-#define H_STATUSLINESZ 7
+#define H_STATUSLINESZ 9
 
 enum h_seltype_t {
   H_SELTYPE_NONE,
@@ -28,12 +28,22 @@ struct h_select_t {
   int end;
 };
 
+struct h_query_t {
+  uint8_t *terms;
+  size_t terms_sz;
+};
+
 struct h_state_t {
   // Currently loaded bytes
   uint8_t *buffer;
 
   // Color-marking information
   uint8_t *markbuf;
+
+  uint8_t *searchbuf;
+  uint8_t *searchposbuf;
+  size_t search_result_count;
+  int searchpos;
 
   // Comments
   char **combuf;
@@ -97,6 +107,9 @@ struct h_state_t {
 
   // Currently loaded file's name
   char fname[H_BUFSZ];
+
+
+  struct h_query_t **queries;
 
 
   // Is the command line active

@@ -8,20 +8,26 @@ struct pollfd fds = {
   .events = POLLIN
 };
 
+// Clears the screen
 void h_tty_cls() {
   printf("\x1b[2J");
 }
 
+// Moves the terminal cursor to position (x, y).
 void h_tty_goto(uint16_t x, uint16_t y) {
   printf("\x1b[%d;%dH", y, x);
 }
 
+// Returns the TTY size combined into a single 32-bit value.
+// The higher 16 bits represent the width and the lower ones represent the
+// height.
 uint32_t h_ttysz() {
   struct winsize wsz;
   ioctl(STDIN_FILENO, TIOCGWINSZ, &wsz);
   return (wsz.ws_col << 16) | (wsz.ws_row & 0xffff);
 }
 
+// Sets the TTY attributes for the program.
 void h_tty_setup(void) {
   tcgetattr(STDIN_FILENO, &encountered_term);
 
@@ -34,10 +40,12 @@ void h_tty_setup(void) {
   tcsetattr(STDIN_FILENO, TCSANOW, &new_term);
 }
 
+// Restores the TTY attributes encountered at the start of the program.
 void h_tty_restore(void) {
   tcsetattr(STDIN_FILENO, TCSANOW, &encountered_term);
 }
 
+// Handles the escape sequence keys
 int h_esc_lbracket_1() {
   int pollres = poll(&fds, 1, 50);
 

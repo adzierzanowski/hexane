@@ -136,6 +136,20 @@ void h_key_handle(int key, struct h_state_t *state) {
       state->cmdline = true;
       break;
 
+    case '/':
+      state->cmdline = true;
+      sprintf(state->cmdbuf, "/ ");
+      state->cmdpos = 2;
+      break;
+
+    case 'n':
+      h_search_next(state);
+      break;
+
+    case 'N':
+      h_search_prev(state);
+      break;
+
     case 'v':
       h_select(state);
       break;
@@ -150,6 +164,7 @@ void h_key_handle(int key, struct h_state_t *state) {
 
     case '\x1b':
       h_selection_clear(state);
+      h_search_reset(state);
       break;
 
     case H_K_F2:

@@ -1,12 +1,17 @@
 #include "render.h"
 
 
-// Returns an ANSI escape sequence if the byte in the `pos` position
+// Stores an ANSI escape sequence in `buf` if the byte in the `pos` position
 // should be formatted somehow. If it shouldn't, the function will
-// return NULL.
+// store an empty string in `buf`.
 void h_getansi(struct h_state_t *state, int pos, char *dst) {
   if (pos == state->cursor_pos) {
     sprintf(dst, "\x1b[7m");
+    return;
+  }
+
+  if (state->searchbuf[pos]) {
+    sprintf(dst, "\x1b[48;5;208m\x1b[38;5;255m");
     return;
   }
 
@@ -55,33 +60,38 @@ void h_render_ascii(struct h_state_t *state, int pos) {
 void h_render_statusline(struct h_state_t *state) {
   printf("%s    ", state->hex ? "HEX" : "DEC");
 
+  #define H_GRAY "\x1b[38;5;249m"
+  #define H_END "\x1b[0m"
+
+  double ratio = (double) state->cursor_pos / (double) state->bufsz * 100.0;
+
   if (state->hex) {
-    printf("CUR %x/%zx    ", state->cursor_pos, state->bufsz);
-    printf("KEY %x %c    ",
+    printf("CUR " H_GRAY "%x/%zx (%3.0lf%%)" H_END "    ", state->cursor_pos, state->bufsz, ratio);
+    printf("KEY " H_GRAY "%x %c" H_END "    ",
         state->last_key,
         isprint(state->last_key) && state->last_key != '\n'
           ? state->last_key
           : ' ');
-    printf("OFF %x    ", state->offset);
-    printf("CMD %s    ", state->cmdline ? "on" : "off");
-    printf("LIM %x    ", h_getlim(state));
+    printf("OFF " H_GRAY "%x" H_END "    ", state->offset);
+    printf("CMD " H_GRAY "%s" H_END "    ", state->cmdline ? "on" : "off");
+    printf("LIM " H_GRAY "%x" H_END "    ", h_getlim(state));
     printf("\x1b[48;5;%dm CLR \x1b[0m    ", state->color);
-    printf("SEL %zx    ", state->selsize + state->cursel_size);
-    printf("FILE %s", state->fname);
+    printf("SEL " H_GRAY "%zx" H_END "    ", state->selsize + state->cursel_size);
+    printf("FILE " H_GRAY "%s" H_END, state->fname);
 
   } else {
-    printf("CUR %d/%zu    ", state->cursor_pos, state->bufsz);
-    printf("KEY %u %c    ",
+    printf("CUR " H_GRAY "%d/%zu (%3.0lf%%)" H_END "    ", state->cursor_pos, state->bufsz, ratio);
+    printf("KEY " H_GRAY "%u %c" H_END "    ",
         state->last_key,
         isprint(state->last_key) && state->last_key != '\n'
           ? state->last_key
           : ' ');
-    printf("OFF %d    ", state->offset);
-    printf("CMD %s    ", state->cmdline ? "on" : "off");
-    printf("LIM %d    ", h_getlim(state));
+    printf("OFF " H_GRAY "%d" H_END "    ", state->offset);
+    printf("CMD " H_GRAY "%s" H_END "    ", state->cmdline ? "on" : "off");
+    printf("LIM " H_GRAY "%d" H_END "    ", h_getlim(state));
     printf("\x1b[48;5;%dm CLR \x1b[0m    ", state->color);
-    printf("SEL %zu    ", state->selsize + state->cursel_size);
-    printf("FILE %s", state->fname);
+    printf("SEL " H_GRAY "%zu" H_END "    ", state->selsize + state->cursel_size);
+    printf("FILE " H_GRAY "%s" H_END, state->fname);
   }
 
   printf("\n");
@@ -95,12 +105,12 @@ void h_render_statusline(struct h_state_t *state) {
 
     if (state->hex) {
       printf(
-        "u8 %02x    u16 %04x    u32 %08x    u64 %016llx\n", u8, *u16, *u32, *u64);
+        "u8 " H_GRAY "%02x" H_END "    u16 " H_GRAY "%04x" H_END "    u32 " H_GRAY "%08x" H_END "    u64 " H_GRAY "%016llx" H_END "\n", u8, *u16, *u32, *u64);
     } else {
       printf(
-        "u8 %3u    u16 %5u    u32 %10u    u64 %20llu\n", u8, *u16, *u32, *u64);
+        "u8 " H_GRAY "%3u" H_END "    u16 " H_GRAY "%5u" H_END "    u32 " H_GRAY "%10u" H_END "    u64 " H_GRAY "%20llu" H_END "\n", u8, *u16, *u32, *u64);
       printf(
-        "i8 %3d    i16 %5d    i32 %10d    i64 %20lld\n", u8, *u16, *u32, *u64);
+        "i8 " H_GRAY "%3d" H_END"    i16 " H_GRAY "%5d" H_END "    i32 " H_GRAY "%10d" H_END "    i64 " H_GRAY "%20lld" H_END "\n", u8, *u16, *u32, *u64);
     }
   }
 
@@ -112,7 +122,7 @@ void h_render_statusline(struct h_state_t *state) {
   }
 
   if (strlen(state->msgbuf) > 0) {
-    printf("%s\n", state->msgbuf);
+    printf("\x1b[48;5;147m\x1b[1m\x1b[38;5;232m %s \x1b[0m\n", state->msgbuf);
     h_msg_clear(state);
   }
 }
@@ -211,7 +221,7 @@ void h_render_color_picker(struct h_state_t *state) {
       printf("\x1b[48;5;%dm %3d \x1b[0m ", i, i);
     }
 
-    if ((i+1) % 16 == 0) {
+    if ((i+1) % 12 == 0) {
       printf("\n");
     }
   }

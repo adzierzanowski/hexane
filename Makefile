@@ -17,6 +17,7 @@ selection \
 state \
 util \
 mark \
+search \
 main
 
 OBJ = $(addprefix $(BUILD)/, $(addsuffix .o, $(NAMES)))
@@ -33,6 +34,9 @@ $(SRC)/%.c: $(SRC)/%.h
 $(BUILD)/%.o: $(SRC)/%.c
 	@ mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) $< -c -o $@
+
+tests: $(addprefix $(BUILD)/, util.o search.o) test/main.c
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
 	- rm -rf $(BUILD)

@@ -5,6 +5,7 @@
 #include "buffer.h"
 #include "msg.h"
 #include "render.h"
+#include "search.h"
 #include "state.h"
 #include "util.h"
 #include "version.h"

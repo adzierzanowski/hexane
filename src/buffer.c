@@ -22,7 +22,7 @@ void h_edit_file(struct h_state_t *state, const char *fname) {
   size_t nbytes = fread(buf, sizeof (uint8_t), H_FBUFSZ, f);
   fclose(f);
 
-  strncpy(state->fname, fname, H_BUFSZ);
+  strncpy(state->fname, fname, H_BUFSZ-1);
   h_msg(state, "Read %zu bytes from '%s'", nbytes, fname);
   h_load_buffer(state, buf, nbytes);
 }

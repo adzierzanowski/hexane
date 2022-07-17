@@ -73,6 +73,8 @@ If you want to replace selected bytes with a value, type:
 :r 0x66
 ```
 
+To navigate through the search results, use `n` and `N`.
+
 #### Color marking
 
 Press `F2` to choose a color, press `m` to mark selected bytes or a byte at

@@ -1,4 +1,4 @@
-CFLAGS = -O3 -Wall -Wpedantic -std=c11
+CFLAGS = -O3 -Wall -Wpedantic -std=c11 -Wno-unused-result -Wno-format
 
 SRC = src
 BUILD = build

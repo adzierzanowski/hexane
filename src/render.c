@@ -107,7 +107,7 @@ void h_render_statusline(struct h_state_t *state) {
 
   if (state->cmdline) {
     printf(":%s_\n", state->cmdbuf);
-  } else if (state->combuf[state->cursor_pos]) {
+  } else if (state->bufsz > 0 && state->combuf[state->cursor_pos]) {
     printf("Comment: %s\n", state->combuf[state->cursor_pos]);
   }
 

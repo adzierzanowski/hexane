@@ -103,6 +103,13 @@ void h_key_handle(int key, struct h_state_t *state) {
       h_selection_clear(state);
       break;
 
+    case 'x':
+      state->hex = !state->hex;
+      h_msg(
+        state,
+        "Number mode changed to %s.", state->hex ? "hexadecimal" : "decimal");
+      break;
+
     default:
       break;
   }

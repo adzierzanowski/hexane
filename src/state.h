@@ -20,6 +20,8 @@ enum h_seltype_t {
   H_SELTYPE_RECT
 };
 
+// A struct representing selection. It's a linked list containing ranges of
+// positions (a start and end position, inclusive).
 struct h_select_t {
   struct h_select_t *next;
   int start;
@@ -27,33 +29,76 @@ struct h_select_t {
 };
 
 struct h_state_t {
+  // Currently loaded bytes
   uint8_t *buffer;
+
+  // Length of the main buffer
   size_t bufsz;
+
+  // Current cursor position (index of the buffer)
   int cursor_pos;
 
+
+  // Applied selections (non-modifiable until cleared)
   struct h_select_t *selections;
+
+  // Currently modified selection
   struct h_select_t *cursel;
+
+  // Mode of the current selection
   enum h_seltype_t cursel_type;
+
+  // Total number of selected bytes in the applied selections list
   size_t selsize;
+
+  // Total number of selected bytes in the current selection list
   size_t cursel_size;
 
+
+  // Number of displayed columns
   int cols;
+
+  // Number of displayed lines
   int lines;
+
+  // Offset of the displayed portion of the buffer (in bytes)
   int offset;
 
+  // Current TTY width and height
   uint16_t tcw, tch;
 
+
+  // Number of the key which was pressed last
   int last_key;
 
+
+  // The command buffer
   char cmdbuf[H_CMDBUFSZ];
+
+  // The position of currently entered command
   int cmdpos;
+
+  // Message buffer
   char msgbuf[H_MSGBUFSZ];
+
+  // Currently loaded file's name
   char fname[H_BUFSZ];
 
+
+  // Is the command line active
   bool cmdline;
+
+  // Is the ASCII representation displayed
   bool ascii;
+
+  // Are the column numbers visible
   bool header;
+
+  // Does the viewport size change on TTY resize
   bool autosize;
+
+  // Are the numbers in the statusline displayed hexadecimally
+  bool hex;
 };
 
 

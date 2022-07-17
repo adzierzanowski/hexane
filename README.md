@@ -22,6 +22,28 @@ The Python version looks like this:
 
 and this version will look very similar.
 
+## TODO
+
+* Selection
+  * Rect selection mode
+* Cursor navigation
+  * `[`, `]` - move cursor up/down by the line limit
+* Buffer manipulation
+  * Removing bytes
+  * Inserting bytes
+  * Copy/paste
+  * Editing bytes
+  * Big-endian view
+* Search
+  * Multiple search queries
+  * Navigate through search results
+* History
+* Marking bytes
+  * Color picker
+  * Eyedropper
+* Comments
+* Serialization of metadata
+
 ## Dependencies
 
 Aside standard POSIX library, none at the moment.

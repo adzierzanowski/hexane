@@ -28,6 +28,7 @@ void h_state_init(struct h_state_t *state) {
   state->ascii = false;
   state->header = false;
   state->autosize = false;
+  state->hex = false;
 
   memset(state->fname, 0, H_BUFSZ);
 

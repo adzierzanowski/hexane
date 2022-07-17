@@ -33,9 +33,50 @@ void h_key_handle_cmd(int key, struct h_state_t *state) {
   h_render(state);
 }
 
+void h_key_handle_color(int key, struct h_state_t *state) {
+  switch (key) {
+    case '\x1b':
+      state->color_picker = false;
+      state->color_pos = state->color;
+      h_render(state);
+      return;
+
+    case '\n':
+      state->color_picker = false;
+      state->color = state->color_pos;
+      h_render(state);
+      return;
+
+    case 'h':
+      state->color_pos -= 1;
+      break;
+
+    case 'j':
+      state->color_pos += 16;
+      break;
+
+    case 'k':
+      state->color_pos -= 16;
+      break;
+
+    case 'l':
+      state->color_pos += 1;
+      break;
+  }
+
+  state->color_pos %= 0x100;
+
+  h_render_color_picker(state);
+}
+
 // Handles the key pressed by the user in the normal mode.
 void h_key_handle(int key, struct h_state_t *state) {
   state->last_key = key;
+
+  if (state->color_picker) {
+    h_key_handle_color(key, state);
+    return;
+  }
 
   if (state->cmdline) {
     h_key_handle_cmd(key, state);
@@ -83,6 +124,14 @@ void h_key_handle(int key, struct h_state_t *state) {
       h_cursor_move(state, 1);
       break;
 
+    case '[':
+      h_cursor_move(state, -state->lines * state->cols / 2);
+      break;
+
+    case ']':
+      h_cursor_move(state, state->lines * state->cols / 2);
+      break;
+
     case ':':
       state->cmdline = true;
       break;
@@ -101,6 +150,18 @@ void h_key_handle(int key, struct h_state_t *state) {
 
     case '\x1b':
       h_selection_clear(state);
+      break;
+
+    case H_K_F2:
+      state->color_picker = true;
+      break;
+
+    case 'P':
+      h_color_eyedrop(state);
+      break;
+
+    case 'm':
+      h_mark_bytes(state);
       break;
 
     case 'x':

@@ -3,6 +3,7 @@
 
 #include "cmdline.h"
 #include "cursor.h"
+#include "mark.h"
 #include "state.h"
 
 

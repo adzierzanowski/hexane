@@ -29,6 +29,9 @@ void h_state_init(struct h_state_t *state) {
   state->header = false;
   state->autosize = false;
   state->hex = false;
+  state->color_picker = false;
+  state->color_pos = 51;
+  state->color = 51;
 
   memset(state->fname, 0, H_BUFSZ);
 

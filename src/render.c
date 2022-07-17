@@ -4,16 +4,24 @@
 // Returns an ANSI escape sequence if the byte in the `pos` position
 // should be formatted somehow. If it shouldn't, the function will
 // return NULL.
-const char *h_getansi(struct h_state_t *state, int pos) {
+void h_getansi(struct h_state_t *state, int pos, char *dst) {
   if (pos == state->cursor_pos) {
-    return "\x1b[7m";
+    sprintf(dst, "\x1b[7m");
+    return;
   }
 
   if (h_selection_includes(state, pos)) {
-    return "\x1b[38;5;51m";
+    sprintf(dst, "\x1b[48;5;51m");
+    return;
   }
 
-  return NULL;
+  if (state->markbuf[pos] != 0) {
+    sprintf(dst, "\x1b[38;5;%dm", state->markbuf[pos]);
+    return;
+  }
+
+
+  dst[0] = 0;
 }
 
 // Renders the ASCII representation of the current line
@@ -29,14 +37,15 @@ void h_render_ascii(struct h_state_t *state, int pos) {
   for (int i = start; i < end; i++) {
     char c = state->buffer[i];
 
-    const char *ansi = h_getansi(state, i);
+    char ansi[H_BUFSZ] = {0};
+    h_getansi(state, i, ansi);
     bool printable = isprint(c);
 
     printf("%s%s%c%s",
-      ansi ? ansi : "",
+      ansi,
       printable ? "" : "\x1b[38;5;8m",
       printable ? c : '.',
-      ansi || !printable ? "\x1b[0m" : "");
+      ansi[0] || !printable ? "\x1b[0m" : "");
   }
 
   printf("\n");
@@ -56,7 +65,7 @@ void h_render_statusline(struct h_state_t *state) {
     printf("OFF %x    ", state->offset);
     printf("CMD %s    ", state->cmdline ? "on" : "off");
     printf("LIM %x    ", h_getlim(state));
-    printf("TTY %xx%x    ", state->tcw, state->tch);
+    printf("\x1b[48;5;%dm CLR \x1b[0m    ", state->color);
     printf("SEL %zx    ", state->selsize + state->cursel_size);
     printf("FILE %s", state->fname);
 
@@ -70,7 +79,7 @@ void h_render_statusline(struct h_state_t *state) {
     printf("OFF %d    ", state->offset);
     printf("CMD %s    ", state->cmdline ? "on" : "off");
     printf("LIM %d    ", h_getlim(state));
-    printf("TTY %dx%d    ", state->tcw, state->tch);
+    printf("\x1b[48;5;%dm CLR \x1b[0m    ", state->color);
     printf("SEL %zu    ", state->selsize + state->cursel_size);
     printf("FILE %s", state->fname);
   }
@@ -109,6 +118,11 @@ void h_render(struct h_state_t *state) {
   h_tty_cls();
   h_tty_goto(0, 0);
 
+  if (state->color_picker) {
+    h_render_color_picker(state);
+    return;
+  }
+
   if (state->bufsz == 0) {
     printf("Empty buffer, type `:e FNAME` to edit file FNAME.");
 
@@ -124,12 +138,13 @@ void h_render(struct h_state_t *state) {
     }
 
     for (int i = state->offset; i < lim; i++) {
-      const char *ansi = h_getansi(state, i);
+      char ansi[H_BUFSZ] = {0};
+      h_getansi(state, i, ansi);
 
       printf("%s%02x%s ",
-        ansi ? ansi : "",
+        ansi,
         state->buffer[i],
-        ansi ? "\x1b[0m" : "");
+        ansi[0] ? "\x1b[0m" : "");
 
       if ((i+1) % state->cols == 0) {
         if (state->ascii) {
@@ -177,5 +192,22 @@ void h_tty_update(struct h_state_t *state) {
     }
 
     h_render(state);
+  }
+}
+
+void h_render_color_picker(struct h_state_t *state) {
+  h_tty_cls();
+  h_tty_goto(0, 0);
+
+  for (int i = 0; i < 0x100; i++) {
+    if (state->color_pos == i) {
+      printf("\x1b[38;5;51m %3d \x1b[0m ", i);
+    } else {
+      printf("\x1b[48;5;%dm %3d \x1b[0m ", i, i);
+    }
+
+    if ((i+1) % 16 == 0) {
+      printf("\n");
+    }
   }
 }

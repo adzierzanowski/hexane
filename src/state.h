@@ -32,6 +32,9 @@ struct h_state_t {
   // Currently loaded bytes
   uint8_t *buffer;
 
+  // Color-marking information
+  uint8_t *markbuf;
+
   // Length of the main buffer
   size_t bufsz;
 
@@ -67,6 +70,14 @@ struct h_state_t {
   // Current TTY width and height
   uint16_t tcw, tch;
 
+  // Selcted marking color
+  uint8_t fg;
+
+  // Current position of the color picker
+  int color_pos;
+
+  // Currently selected marking color
+  int color;
 
   // Number of the key which was pressed last
   int last_key;
@@ -99,6 +110,9 @@ struct h_state_t {
 
   // Are the numbers in the statusline displayed hexadecimally
   bool hex;
+
+  // Is color picker active
+  bool color_picker;
 };
 
 

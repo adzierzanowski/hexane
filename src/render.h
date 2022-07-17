@@ -12,8 +12,8 @@
 
 // Gets an ANSI escape code depending on the current state
 // if the byte in the `pos` position shouldn't be formatted,
-// the function will return NULL
-const char *h_getansi(struct h_state_t *state, int pos);
+// the function will set `dst` to an empty string
+void h_getansi(struct h_state_t *state, int pos, char *dst);
 
 // Renders the current line's ASCII representation
 void h_render_ascii(struct h_state_t *state, int pos);
@@ -26,5 +26,8 @@ void h_render(struct h_state_t *state);
 
 // Updates the viewport state depending on the current TTY size
 void h_tty_update(struct h_state_t *state);
+
+// Renders color picker
+void h_render_color_picker(struct h_state_t *state);
 
 #endif

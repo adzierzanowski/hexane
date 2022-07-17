@@ -4,7 +4,7 @@ SRC = src
 BUILD = build
 TARGET = hexane
 
-NAMES = buffer cmdline cursor io keys main msg render selection state util main
+NAMES = buffer cmdline cursor io keys main msg render selection state util mark main
 OBJ = $(addprefix $(BUILD)/, $(addsuffix .o, $(NAMES)))
 HEADERS = $(addprefix $(SRC)/, $(addsuffix .h, $(filter-out main, $(NAMES))))
 

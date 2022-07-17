@@ -16,7 +16,7 @@ void h_cursor_validate(struct h_state_t *state) {
 
   int lim = h_getlim(state);
 
-  if (pos > lim || pos < state->offset) {
+  if (pos >= lim || pos < state->offset) {
     int poslim = pos - lim;
 
     if (poslim > 0 && poslim < state->cols) {

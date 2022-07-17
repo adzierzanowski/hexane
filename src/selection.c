@@ -48,6 +48,7 @@ void h_selection_update(struct h_state_t *state) {
   }
 }
 
+
 // Clears all selections.
 void h_selection_clear(struct h_state_t *state) {
   struct h_select_t *ptr = state->cursel;
@@ -74,39 +75,75 @@ void h_selection_clear(struct h_state_t *state) {
 // Returns `true` if the byte in the `pos` position is selected.
 // Otherwise, returns `false`.
 bool h_selection_includes(struct h_state_t *state, int pos) {
-  struct h_select_t *sel = state->cursel;
+  struct h_select_t *sel = h_selection_next(state, true);
 
   while (sel != NULL) {
-    int start = sel->start;
-    int end = sel->end;
-    if (start > end) {
-      start = sel->end;
-      end = sel->start;
-    }
+    struct h_select_t s = h_selection_sorted(sel);
 
-    if (pos >= start && pos <= end) {
+    if (pos >= s.start && pos <= s.end) {
       return true;
     }
 
-    sel = sel->next;
-  }
-
-  sel = state->selections;
-
-  while (sel != NULL) {
-    int start = sel->start;
-    int end = sel->end;
-    if (start > end) {
-      start = sel->end;
-      end = sel->start;
-    }
-
-    if (pos >= start && pos <= end) {
-      return true;
-    }
-
-    sel = sel->next;
+    sel = h_selection_next(state, false);
   }
 
   return false;
+}
+
+// Returns a copy of `sel` with sorted `start` and `end` fields.
+struct h_select_t h_selection_sorted(struct h_select_t *sel) {
+  struct h_select_t out;
+  if (sel->end > sel->start) {
+    out.start = sel->start;
+    out.end = sel->end;
+  } else {
+    out.start = sel->end;
+    out.end = sel->start;
+  }
+  out.next = sel->next;
+
+  return out;
+}
+
+// This function is an "iterator" which chains two linked lists of selections.
+// It returns a pointer to an element of these lists.
+// If `reset` is set to `true`, the function chooses a selection which is
+// probably not NULL. When the ptr becomes NULL, the function switches to the
+// other list and returns pointers to that list's elements.
+struct h_select_t *h_selection_next(struct h_state_t *state, bool reset) {
+  static struct h_select_t *ptr = NULL;
+
+  // Are we in the list selected at the reset?
+  static bool in_first = true;
+
+  // Did we begin with the current selections list at the reset?
+  static bool started_with_cursel = false;
+
+  if (reset) {
+    if (state->selections) {
+      // We've got some elements in this list, so let's start with it.
+      ptr = state->selections;
+      started_with_cursel = false;
+    } else {
+      ptr = state->cursel;
+      started_with_cursel = true;
+    }
+
+    in_first = true;
+    return ptr;
+  }
+
+  ptr = ptr->next;
+
+  // We've reached the NULL in the first list. Make a switch to the other one.
+  if (!ptr && in_first) {
+    if (started_with_cursel) {
+      ptr = state->selections;
+    } else {
+      ptr = state->cursel;
+    }
+    in_first = false;
+  }
+
+  return ptr;
 }

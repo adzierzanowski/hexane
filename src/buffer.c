@@ -40,3 +40,49 @@ void h_save_file(struct h_state_t *state, const char *fname) {
 
   h_msg(state, "Written %zu bytes to '%s'", nbytes, fname);
 }
+
+void h_buffer_set_bytes(struct h_state_t *state, uint8_t val) {
+  struct h_select_t *sel = h_selection_next(state, true);
+
+  if (!sel) {
+    state->buffer[state->cursor_pos] = val;
+    return;
+  }
+
+  while (sel) {
+    struct h_select_t s = h_selection_sorted(sel);
+
+    for (int i = s.start; i <= s.end; i++) {
+      state->buffer[i] = val;
+    }
+
+    sel = h_selection_next(state, false);
+  }
+}
+
+void h_buffer_set_bytes_rel(struct h_state_t *state, int diff) {
+  struct h_select_t *sel = h_selection_next(state, true);
+
+  if (!sel) {
+    state->buffer[state->cursor_pos] += diff;
+    return;
+  }
+
+  while (sel) {
+    struct h_select_t s = h_selection_sorted(sel);
+
+    for (int i = s.start; i <= s.end; i++) {
+      state->buffer[i] += diff;
+    }
+
+    sel = h_selection_next(state, false);
+  }
+}
+
+void h_buffer_increment(struct h_state_t *state) {
+  h_buffer_set_bytes_rel(state, 1);
+}
+
+void h_buffer_decrement(struct h_state_t *state) {
+  h_buffer_set_bytes_rel(state, -1);
+}

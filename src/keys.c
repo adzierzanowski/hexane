@@ -91,6 +91,14 @@ void h_key_handle(int key, struct h_state_t *state) {
       h_select(state);
       break;
 
+    case '=':
+      h_buffer_increment(state);
+      break;
+
+    case '-':
+      h_buffer_decrement(state);
+      break;
+
     case '\x1b':
       h_selection_clear(state);
       break;

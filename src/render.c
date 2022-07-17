@@ -44,7 +44,7 @@ void h_render_ascii(struct h_state_t *state, int pos) {
 
 // Renders the status line.
 void h_render_statusline(struct h_state_t *state) {
-  printf("CUR %d    ", state->cursor_pos);
+  printf("CUR %d/%zu    ", state->cursor_pos, state->bufsz);
   printf("KEY %u %c    ",
       state->last_key,
       isprint(state->last_key) && state->last_key != '\n'

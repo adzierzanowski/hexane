@@ -96,6 +96,36 @@ void h_cmd_handle(struct h_state_t *state) {
         h_msg(state, "Bad argument for line limit.");
       }
 
+    } else if (h_strmatch(tok, "r", "replace", "sub", NULL)) {
+      tok = strtok(NULL, " ");
+
+      if (tok == NULL) {
+        h_msg(state, "Replacing bytes requires a value.");
+        h_cmd_clear(state);
+        return;
+      }
+
+      char *endptr = NULL;
+      int val = strtoul(tok, &endptr, 0);
+
+      if (endptr && *endptr != 0) {
+        h_msg(
+          state,
+          "%s is not a properly formatted value. "
+          "E.g. for 20, use 20, 0x14 or 024.");
+        h_cmd_clear(state);
+        return;
+      }
+
+      h_buffer_set_bytes(state, val);
+      size_t nbytes = state->selsize + state->cursel_size;
+      h_msg(
+        state,
+        "Replaced %zu byte(s) with %u (0x%02x).",
+        nbytes ? nbytes : 1,
+        val,
+        val);
+
     } else {
       h_msg(state, "Unknown command: %s", state->cmdbuf);
     }
